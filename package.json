@@ -8,11 +8,12 @@
     "dev": "concurrently -k \"npm:dev:main\" \"npm:dev:renderer\" \"npm:dev:electron\"",
     "dev:main": "tsc -p tsconfig.main.json --watch",
     "dev:renderer": "vite",
-    "dev:electron": "wait-on tcp:5173 file:dist/main/main.js file:dist/preload/preload.js && nodemon --watch dist/main --watch dist/preload --ext js --exec \"electron .\"",
+    "dev:electron": "wait-on tcp:5173 file:dist/main/main.js file:dist/preload/preload.js file:dist/dev/devElectron.js && node dist/dev/devElectron.js",
     "build": "npm run build:main && npm run build:renderer",
     "build:main": "tsc -p tsconfig.main.json",
     "build:renderer": "vite build",
-    "typecheck": "tsc -p tsconfig.main.json --noEmit && tsc -p tsconfig.renderer.json --noEmit"
+    "typecheck": "tsc -p tsconfig.main.json --noEmit && tsc -p tsconfig.renderer.json --noEmit",
+    "dist:win": "npm run build && electron-builder --win nsis"
   },
   "dependencies": {
     "react": "^19.1.0",
@@ -25,9 +26,29 @@
     "@vitejs/plugin-react": "^5.0.0",
     "concurrently": "^9.0.1",
     "electron": "^36.0.0",
-    "nodemon": "^3.1.10",
+    "electron-builder": "^26.8.1",
     "typescript": "^5.8.3",
     "vite": "^7.0.0",
     "wait-on": "^8.0.1"
+  },
+  "build": {
+    "appId": "com.dong.portfolio",
+    "productName": "Dong Portfolio",
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "dist/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": "nsis",
+      "signAndEditExecutable": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
   }
 }

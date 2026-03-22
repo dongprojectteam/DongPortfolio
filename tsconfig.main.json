@@ -8,5 +8,5 @@
     "moduleResolution": "NodeNext",
     "module": "NodeNext"
   },
-  "include": ["src/main/**/*.ts", "src/preload/**/*.ts"]
+  "include": ["src/main/**/*.ts", "src/preload/**/*.ts", "src/dev/**/*.ts"]
 }
