@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { PortfolioImage, PortfolioPage } from '../templates/types';
 
 export interface PortfolioEditorProps {
@@ -21,19 +21,42 @@ const createEmptyPage = (): PortfolioPage => ({
   selectedTemplate: 'hero'
 });
 
-const mapFilesToImages = (files: FileList): PortfolioImage[] =>
-  Array.from(files).map((file) => ({
-    id: createImageId(),
-    src: URL.createObjectURL(file),
-    alt: file.name
-  }));
+const readFileAsDataUrl = (file: File): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        resolve(reader.result);
+        return;
+      }
+
+      reject(new Error(`Unable to read file "${file.name}" as data URL.`));
+    };
+
+    reader.onerror = () => {
+      reject(reader.error ?? new Error(`Unable to read file "${file.name}".`));
+    };
+
+    reader.readAsDataURL(file);
+  });
+
+const mapFilesToImages = async (files: FileList): Promise<PortfolioImage[]> =>
+  Promise.all(
+    Array.from(files).map(async (file) => ({
+      id: createImageId(),
+      src: await readFileAsDataUrl(file),
+      alt: file.name,
+      fileName: file.name
+    }))
+  );
 
 export const PortfolioEditor = ({
   initialValue,
   onChange
 }: PortfolioEditorProps): React.JSX.Element => {
   const [page, setPage] = useState<PortfolioPage>(initialValue ?? createEmptyPage);
-  const objectUrlsRef = useRef<string[]>([]);
+  const [isReadingImages, setIsReadingImages] = useState(false);
 
   useEffect(() => {
     if (!initialValue) {
@@ -47,45 +70,36 @@ export const PortfolioEditor = ({
     onChange?.(page);
   }, [onChange, page]);
 
-  useEffect(() => {
-    return () => {
-      objectUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
-    };
-  }, []);
-
   const updatePage = (updater: (current: PortfolioPage) => PortfolioPage) => {
     setPage((current) => updater(current));
   };
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const { files } = event.target;
 
     if (!files || files.length === 0) {
       return;
     }
 
-    const nextImages = mapFilesToImages(files);
-    objectUrlsRef.current.push(...nextImages.map((image) => image.src));
+    setIsReadingImages(true);
 
-    updatePage((current) => ({
-      ...current,
-      images: [...current.images, ...nextImages]
-    }));
+    try {
+      const nextImages = await mapFilesToImages(files);
 
-    event.target.value = '';
+      updatePage((current) => ({
+        ...current,
+        images: [...current.images, ...nextImages]
+      }));
+    } finally {
+      setIsReadingImages(false);
+      event.target.value = '';
+    }
   };
 
   const removeImage = (imageId: string) => {
     updatePage((current) => {
-      const imageToRemove = current.images.find((image) => image.id === imageId);
-
-      if (imageToRemove) {
-        URL.revokeObjectURL(imageToRemove.src);
-        objectUrlsRef.current = objectUrlsRef.current.filter(
-          (url) => url !== imageToRemove.src
-        );
-      }
-
       return {
         ...current,
         images: current.images.filter((image) => image.id !== imageId)
@@ -136,7 +150,9 @@ export const PortfolioEditor = ({
         <span className="portfolio-editor__label">Images</span>
         <input type="file" accept="image/*" multiple onChange={handleFileChange} />
         <span className="portfolio-editor__hint">
-          Upload one or more images for this portfolio page.
+          {isReadingImages
+            ? 'Reading images for preview and export...'
+            : 'Upload one or more images for this portfolio page.'}
         </span>
       </label>
 

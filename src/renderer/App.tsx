@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { PortfolioEditor } from './components/PortfolioEditor';
 import { PortfolioPreview } from './components/PortfolioPreview';
+import type { HtmlExportResult } from '../shared/export';
 import {
   ThemeProvider,
   fontRegistry,
@@ -84,6 +85,13 @@ const AppContent = (): React.JSX.Element => {
   const { fontId, setFontId, setThemeId, themeId } = useTheme();
   const [pages, setPages] = useState(samplePages);
   const [selectedPageId, setSelectedPageId] = useState(samplePages[0].id);
+  const [exportState, setExportState] = useState<{
+    isExporting: boolean;
+    message: string | null;
+  }>({
+    isExporting: false,
+    message: null
+  });
 
   const selectedPage =
     pages.find((page) => page.id === selectedPageId) ?? samplePages[0];
@@ -107,6 +115,37 @@ const AppContent = (): React.JSX.Element => {
     );
   };
 
+  const exportHtml = async () => {
+    setExportState({
+      isExporting: true,
+      message: null
+    });
+
+    try {
+      const result: HtmlExportResult = await window.desktopApp.exportHtml({
+        documentTitle: appInfo.name,
+        themeId,
+        fontId,
+        pages
+      });
+
+      setExportState({
+        isExporting: false,
+        message: result.canceled
+          ? 'Export canceled.'
+          : `Exported HTML to ${result.filePath}`
+      });
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Failed to export HTML.';
+
+      setExportState({
+        isExporting: false,
+        message
+      });
+    }
+  };
+
   return (
     <main className="app-shell app-shell--workspace">
       <section className="workspace-panel workspace-panel--sidebar">
@@ -117,6 +156,22 @@ const AppContent = (): React.JSX.Element => {
             Editor changes flow into shared page state, then the preview renders
             from that state using the selected template.
           </p>
+        </div>
+
+        <div className="app-actions">
+          <button
+            className="primary-action"
+            disabled={exportState.isExporting}
+            onClick={() => {
+              void exportHtml();
+            }}
+            type="button"
+          >
+            {exportState.isExporting ? 'Exporting...' : 'Export HTML'}
+          </button>
+          {exportState.message ? (
+            <p className="action-message">{exportState.message}</p>
+          ) : null}
         </div>
 
         <div className="theme-controls">

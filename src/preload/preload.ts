@@ -1,4 +1,5 @@
-import { contextBridge } from 'electron';
+import { contextBridge, ipcRenderer } from 'electron';
+import type { HtmlExportPayload, HtmlExportResult } from '../shared/export';
 
 export type AppInfo = {
   name: string;
@@ -11,5 +12,7 @@ const appInfo: AppInfo = {
 };
 
 contextBridge.exposeInMainWorld('desktopApp', {
-  getAppInfo: (): AppInfo => appInfo
+  getAppInfo: (): AppInfo => appInfo,
+  exportHtml: (payload: HtmlExportPayload): Promise<HtmlExportResult> =>
+    ipcRenderer.invoke('export:html', payload)
 });

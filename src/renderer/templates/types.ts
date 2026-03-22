@@ -6,6 +6,7 @@ export interface PortfolioImage {
   id: string;
   src: string;
   alt: string;
+  fileName?: string;
 }
 
 export interface PortfolioPage {
