@@ -1,6 +1,7 @@
 import { app, BrowserWindow } from 'electron';
 import path from 'node:path';
 import { registerHtmlExportIpc } from './exportHtml';
+import { registerPortfolioFileIpc } from './portfolioFile';
 
 const isDev = !app.isPackaged;
 
@@ -34,6 +35,7 @@ const createMainWindow = async (): Promise<BrowserWindow> => {
 };
 
 app.whenReady().then(async () => {
+  registerPortfolioFileIpc();
   registerHtmlExportIpc();
   await createMainWindow();
 

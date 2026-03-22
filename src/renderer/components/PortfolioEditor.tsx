@@ -1,25 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { createImageId } from '../../shared/portfolio';
 import type { PortfolioImage, PortfolioPage } from '../templates/types';
 
 export interface PortfolioEditorProps {
-  initialValue?: PortfolioPage;
-  onChange?: (value: PortfolioPage) => void;
+  page: PortfolioPage;
+  onChange: (value: PortfolioPage) => void;
 }
-
-const createImageId = (): string =>
-  `image-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-
-const createPageId = (): string =>
-  `page-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-
-const createEmptyPage = (): PortfolioPage => ({
-  id: createPageId(),
-  date: new Date().toISOString().slice(0, 10),
-  title: '',
-  content: '',
-  images: [],
-  selectedTemplate: 'hero'
-});
 
 const readFileAsDataUrl = (file: File): Promise<string> =>
   new Promise((resolve, reject) => {
@@ -52,26 +38,13 @@ const mapFilesToImages = async (files: FileList): Promise<PortfolioImage[]> =>
   );
 
 export const PortfolioEditor = ({
-  initialValue,
+  page,
   onChange
 }: PortfolioEditorProps): React.JSX.Element => {
-  const [page, setPage] = useState<PortfolioPage>(initialValue ?? createEmptyPage);
   const [isReadingImages, setIsReadingImages] = useState(false);
 
-  useEffect(() => {
-    if (!initialValue) {
-      return;
-    }
-
-    setPage(initialValue);
-  }, [initialValue]);
-
-  useEffect(() => {
-    onChange?.(page);
-  }, [onChange, page]);
-
   const updatePage = (updater: (current: PortfolioPage) => PortfolioPage) => {
-    setPage((current) => updater(current));
+    onChange(updater(page));
   };
 
   const handleFileChange = async (
