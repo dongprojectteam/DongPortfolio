@@ -1,11 +1,12 @@
 import { useMemo, useState } from 'react';
+import { PortfolioEditor } from './components/PortfolioEditor';
+import { PortfolioPreview } from './components/PortfolioPreview';
 import {
   ThemeProvider,
   fontRegistry,
   themeRegistry,
   useTheme
 } from './theme/ThemeProvider';
-import { TemplateRenderer } from './templates/TemplateRenderer';
 import { getAllowedTemplates, getTemplateForImageCount } from './templates/logic';
 import { templateRegistry } from './templates/registry';
 import type { PortfolioPage, TemplateId } from './templates/types';
@@ -100,6 +101,12 @@ const AppContent = (): React.JSX.Element => {
     );
   };
 
+  const updateSelectedPage = (nextPage: PortfolioPage) => {
+    setPages((currentPages) =>
+      currentPages.map((page) => (page.id === nextPage.id ? nextPage : page))
+    );
+  };
+
   return (
     <main className="app-shell app-shell--workspace">
       <section className="workspace-panel workspace-panel--sidebar">
@@ -107,8 +114,8 @@ const AppContent = (): React.JSX.Element => {
           <p className="eyebrow">Template + Theme System</p>
           <h1>{appInfo.name}</h1>
           <p className="description">
-            Registry-driven templates and a global theme layer based on CSS
-            variables. Theme and font changes apply across the entire workspace.
+            Editor changes flow into shared page state, then the preview renders
+            from that state using the selected template.
           </p>
         </div>
 
@@ -163,7 +170,7 @@ const AppContent = (): React.JSX.Element => {
                 onClick={() => setSelectedPageId(page.id)}
                 type="button"
               >
-                <span>{page.title}</span>
+                <span>{page.title || 'Untitled page'}</span>
                 <small>
                   {page.images.length} images · auto {templateRegistry[recommended].label}
                 </small>
@@ -194,21 +201,16 @@ const AppContent = (): React.JSX.Element => {
             ))}
           </div>
         </div>
+
+        <div className="template-switcher">
+          <h2>Edit Page</h2>
+          <p>Changes here update the selected page, and the preview follows immediately.</p>
+          <PortfolioEditor initialValue={selectedPage} onChange={updateSelectedPage} />
+        </div>
       </section>
 
       <section className="workspace-panel workspace-panel--preview">
-        <header className="preview-header">
-          <div>
-            <p className="eyebrow">Live Preview</p>
-            <h2>{templateRegistry[selectedPage.selectedTemplate].label}</h2>
-          </div>
-          <p className="preview-meta">
-            Global theme is applied through CSS variables
-          </p>
-        </header>
-        <div className="preview-surface">
-          <TemplateRenderer page={selectedPage} />
-        </div>
+        <PortfolioPreview pages={pages} selectedPageId={selectedPageId} />
       </section>
     </main>
   );
