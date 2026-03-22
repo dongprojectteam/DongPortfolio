@@ -1,0 +1,102 @@
+:root {
+  color-scheme: light;
+  font-family: "Segoe UI", sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color: #1d1d1b;
+  background:
+    radial-gradient(circle at top, rgba(190, 168, 127, 0.28), transparent 42%),
+    linear-gradient(180deg, #f7f2e8 0%, #efe6d8 100%);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  min-height: 100vh;
+}
+
+.app-shell {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 32px;
+}
+
+.hero-card {
+  width: min(720px, 100%);
+  padding: 40px;
+  border: 1px solid rgba(58, 47, 31, 0.1);
+  border-radius: 28px;
+  background: rgba(255, 252, 247, 0.82);
+  box-shadow: 0 30px 80px rgba(77, 57, 27, 0.12);
+  backdrop-filter: blur(12px);
+}
+
+.eyebrow {
+  margin: 0 0 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.78rem;
+  color: #836b42;
+}
+
+.hero-card h1 {
+  margin: 0;
+  font-size: clamp(2.5rem, 5vw, 4.25rem);
+  line-height: 0.95;
+}
+
+.description {
+  margin: 20px 0 0;
+  max-width: 54ch;
+  font-size: 1.05rem;
+  color: #4b4335;
+}
+
+.meta-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin: 32px 0 0;
+}
+
+.meta-grid div {
+  padding: 16px;
+  border-radius: 18px;
+  background: rgba(246, 239, 226, 0.9);
+}
+
+.meta-grid dt {
+  font-size: 0.82rem;
+  color: #7f715c;
+}
+
+.meta-grid dd {
+  margin: 8px 0 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #2f281f;
+}
+
+@media (max-width: 720px) {
+  .app-shell {
+    padding: 20px;
+  }
+
+  .hero-card {
+    padding: 28px;
+  }
+
+  .meta-grid {
+    grid-template-columns: 1fr;
+  }
+}
