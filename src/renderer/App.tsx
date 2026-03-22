@@ -1,4 +1,10 @@
 import { useMemo, useState } from 'react';
+import {
+  ThemeProvider,
+  fontRegistry,
+  themeRegistry,
+  useTheme
+} from './theme/ThemeProvider';
 import { TemplateRenderer } from './templates/TemplateRenderer';
 import { getAllowedTemplates, getTemplateForImageCount } from './templates/logic';
 import { templateRegistry } from './templates/registry';
@@ -72,8 +78,9 @@ const samplePages: PortfolioPage[] = [
   }
 ];
 
-export const App = (): React.JSX.Element => {
+const AppContent = (): React.JSX.Element => {
   const appInfo = window.desktopApp.getAppInfo();
+  const { fontId, setFontId, setThemeId, themeId } = useTheme();
   const [pages, setPages] = useState(samplePages);
   const [selectedPageId, setSelectedPageId] = useState(samplePages[0].id);
 
@@ -97,12 +104,52 @@ export const App = (): React.JSX.Element => {
     <main className="app-shell app-shell--workspace">
       <section className="workspace-panel workspace-panel--sidebar">
         <div>
-          <p className="eyebrow">Template System</p>
+          <p className="eyebrow">Template + Theme System</p>
           <h1>{appInfo.name}</h1>
           <p className="description">
-            Registry-driven React templates chosen by image count, with
-            per-page switching when multiple layouts are valid.
+            Registry-driven templates and a global theme layer based on CSS
+            variables. Theme and font changes apply across the entire workspace.
           </p>
+        </div>
+
+        <div className="theme-controls">
+          <div className="field-group">
+            <label className="field-label" htmlFor="theme-select">
+              Color Theme
+            </label>
+            <select
+              id="theme-select"
+              value={themeId}
+              onChange={(event) =>
+                setThemeId(event.target.value as keyof typeof themeRegistry)
+              }
+            >
+              {Object.values(themeRegistry).map((theme) => (
+                <option key={theme.id} value={theme.id}>
+                  {theme.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="field-group">
+            <label className="field-label" htmlFor="font-select">
+              Font
+            </label>
+            <select
+              id="font-select"
+              value={fontId}
+              onChange={(event) =>
+                setFontId(event.target.value as keyof typeof fontRegistry)
+              }
+            >
+              {Object.values(fontRegistry).map((font) => (
+                <option key={font.id} value={font.id}>
+                  {font.label}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
         <div className="page-list">
@@ -156,7 +203,7 @@ export const App = (): React.JSX.Element => {
             <h2>{templateRegistry[selectedPage.selectedTemplate].label}</h2>
           </div>
           <p className="preview-meta">
-            Rendered through registry and `TemplateRenderer`
+            Global theme is applied through CSS variables
           </p>
         </header>
         <div className="preview-surface">
@@ -164,5 +211,13 @@ export const App = (): React.JSX.Element => {
         </div>
       </section>
     </main>
+  );
+};
+
+export const App = (): React.JSX.Element => {
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
   );
 };

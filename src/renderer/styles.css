@@ -1,12 +1,23 @@
 :root {
   color-scheme: light;
-  font-family: "Segoe UI", sans-serif;
   line-height: 1.5;
   font-weight: 400;
-  color: #1d1d1b;
-  background:
-    radial-gradient(circle at top, rgba(190, 168, 127, 0.28), transparent 42%),
-    linear-gradient(180deg, #f7f2e8 0%, #efe6d8 100%);
+  --app-bg: linear-gradient(180deg, #f7f2e8 0%, #efe6d8 100%);
+  --app-bg-accent: radial-gradient(
+    circle at top,
+    rgba(190, 168, 127, 0.28),
+    transparent 42%
+  );
+  --panel-bg: rgba(255, 252, 247, 0.82);
+  --panel-surface: rgba(246, 239, 226, 0.9);
+  --panel-border: rgba(58, 47, 31, 0.1);
+  --panel-shadow: rgba(77, 57, 27, 0.12);
+  --preview-bg: linear-gradient(180deg, #f4ecde 0%, #ecdfcb 100%);
+  --text-primary: #1d1d1b;
+  --text-muted: #665c4d;
+  --accent: #836b42;
+  --accent-soft: rgba(233, 222, 201, 0.95);
+  --font-family-base: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
 }
 
 * {
@@ -31,6 +42,13 @@ select {
   font: inherit;
 }
 
+.theme-root {
+  min-height: 100vh;
+  color: var(--text-primary);
+  background: var(--app-bg-accent), var(--app-bg);
+  font-family: var(--font-family-base);
+}
+
 .app-shell {
   min-height: 100vh;
   display: grid;
@@ -45,10 +63,10 @@ select {
 }
 
 .workspace-panel {
-  border: 1px solid rgba(58, 47, 31, 0.1);
+  border: 1px solid var(--panel-border);
   border-radius: 28px;
-  background: rgba(255, 252, 247, 0.82);
-  box-shadow: 0 30px 80px rgba(77, 57, 27, 0.12);
+  background: var(--panel-bg);
+  box-shadow: 0 30px 80px var(--panel-shadow);
   backdrop-filter: blur(12px);
 }
 
@@ -68,12 +86,13 @@ select {
   text-transform: uppercase;
   letter-spacing: 0.12em;
   font-size: 0.78rem;
-  color: #836b42;
+  color: var(--accent);
 }
 
 h1,
 h2 {
   margin: 0;
+  color: inherit;
 }
 
 .workspace-panel h1 {
@@ -85,24 +104,46 @@ h2 {
   margin: 20px 0 0;
   max-width: 54ch;
   font-size: 1.05rem;
-  color: #4b4335;
+  color: var(--text-muted);
 }
 
+.theme-controls,
 .page-list,
 .template-option-list {
   display: grid;
   gap: 16px;
 }
 
+.field-group {
+  display: grid;
+  gap: 8px;
+}
+
+.field-label {
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.field-group select {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--panel-border);
+  background: var(--panel-surface);
+  color: var(--text-primary);
+}
+
 .page-list-item,
 .template-option {
   width: 100%;
   text-align: left;
-  border: 1px solid rgba(58, 47, 31, 0.12);
+  border: 1px solid var(--panel-border);
   cursor: pointer;
   padding: 16px;
   border-radius: 18px;
-  background: rgba(246, 239, 226, 0.9);
+  background: var(--panel-surface);
   color: inherit;
 }
 
@@ -116,13 +157,13 @@ h2 {
 .template-option span,
 .template-switcher p,
 .preview-meta {
-  color: #665c4d;
+  color: var(--text-muted);
 }
 
 .page-list-item.is-active,
 .template-option.is-selected {
-  border-color: #836b42;
-  background: rgba(233, 222, 201, 0.95);
+  border-color: var(--accent);
+  background: var(--accent-soft);
 }
 
 .template-switcher {
@@ -144,7 +185,7 @@ h2 {
   min-height: 720px;
   padding: 24px;
   border-radius: 24px;
-  background: linear-gradient(180deg, #f4ecde 0%, #ecdfcb 100%);
+  background: var(--preview-bg);
 }
 
 .portfolio-template {
@@ -152,9 +193,9 @@ h2 {
   margin: 0 auto;
   padding: 28px;
   border-radius: 24px;
-  background: #fffdf8;
-  color: #1e1b16;
-  box-shadow: 0 20px 50px rgba(70, 52, 24, 0.12);
+  background: var(--panel-bg);
+  color: var(--text-primary);
+  box-shadow: 0 20px 50px var(--panel-shadow);
 }
 
 .portfolio-template img {
@@ -170,7 +211,7 @@ h2 {
   font-size: 0.8rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #7a6645;
+  color: var(--accent);
 }
 
 .portfolio-template h2 {
